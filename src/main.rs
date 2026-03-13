@@ -1,13 +1,16 @@
+use std::io::{self, Read};
+
 use anyhow::{Context, Result, bail, ensure};
 use hound::WavReader;
 use itertools::Itertools;
 
 fn main() -> Result<()> {
-    // let mut r = WavReader::open(dbg!("apple-hello-cut.wav"))?;
-    let mut r = WavReader::open(dbg!("apple-hello.wav"))?;
-
-    let samples: Vec<_> = r.samples::<i16>().try_collect()?;
-    dbg!(&samples);
+    let mut input_bytes = vec![];
+    io::stdin().lock().read_to_end(&mut input_bytes)?;
+    let samples: Vec<_> = WavReader::new(&*input_bytes)?
+        .samples::<i16>()
+        .try_collect()?;
+    // dbg!(&samples);
 
     let bits = samples_to_bits(&samples)?;
 
